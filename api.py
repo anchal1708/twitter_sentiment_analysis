@@ -6,8 +6,9 @@ from pathlib import Path
 app = FastAPI(title="Twitter Sentiment Analysis API")
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "src" / "sentiment_model.pkl"
-VECTORIZER_PATH = BASE_DIR / "src" / "vectorizer.pkl"
+MODEL_PATH = BASE_DIR / "sentiment_model.pkl"
+VECTORIZER_PATH = BASE_DIR / "vectorizer.pkl"
+
 
 with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)
@@ -20,12 +21,14 @@ class TweetRequest(BaseModel):
 
 @app.get("/")
 def home():
-    return {"message": "Sentiment Analysis API is running"}
+    return {"message": "Twitter Sentiment Analysis API is running"}
 
 @app.post("/predict")
 def predict_sentiment(request: TweetRequest):
-    text_vec = vectorizer.transform([request.text])
-    prediction = model.predict(text_vec)[0]
-    return {"sentiment": prediction}
+    text_vector = vectorizer.transform([request.text])
+    prediction = model.predict(text_vector)[0]
+
+    sentiment = "Positive" if prediction == 1 else "Negative"
+    return {"sentiment": sentiment}
 
 
